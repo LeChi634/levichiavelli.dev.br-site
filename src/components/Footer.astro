@@ -1,0 +1,14 @@
+---
+import { content } from '../data/site';
+import T from './T.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line/60 py-8">
+  <div
+    class="mx-auto flex max-w-6xl flex-col gap-2 px-5 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
+    <p>© {year} Levi Chiavelli. <T value={content.footer.rights} /></p>
+    <p><T value={content.footer.builtWith} /></p>
+  </div>
+</footer>

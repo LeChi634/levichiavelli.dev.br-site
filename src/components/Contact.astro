@@ -1,0 +1,59 @@
+---
+import { contact, content, site } from '../data/site';
+import T from './T.astro';
+---
+
+<section id="contato" class="py-20 sm:py-24">
+  <div class="mx-auto max-w-6xl px-5 sm:px-8">
+    <div class="card relative overflow-hidden p-8 sm:p-12">
+      <div
+        class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl"
+        aria-hidden="true">
+      </div>
+
+      <div class="relative max-w-2xl">
+        <p class="kicker"><T value={content.contact.kicker} /></p>
+        <h2 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+          <T value={content.contact.heading} />
+        </h2>
+        <p class="mt-4 text-base leading-relaxed text-muted">
+          <T value={content.contact.intro} />
+        </p>
+      </div>
+
+      <div class="relative mt-10 grid gap-3 sm:grid-cols-3">
+        <a
+          class="rounded-lg border border-line bg-bg p-4 transition-colors hover:border-accent/60"
+          href={contact.emailHref}>
+          <span class="block text-xs text-muted"><T value={content.contact.emailLabel} /></span>
+          <span class="mt-1 block break-all text-sm font-medium text-ink">{contact.email}</span>
+        </a>
+
+        <a
+          class="rounded-lg border border-line bg-bg p-4 transition-colors hover:border-accent/60"
+          href={site.github}
+          target="_blank"
+          rel="noopener noreferrer">
+          <span class="block text-xs text-muted"><T value={content.contact.githubLabel} /></span>
+          <span class="mt-1 block text-sm font-medium text-ink">github.com/LeChi634</span>
+        </a>
+
+        <a
+          class="rounded-lg border border-line bg-bg p-4 transition-colors hover:border-accent/60"
+          href={contact.linkedinHref}
+          target="_blank"
+          rel="noopener noreferrer">
+          <span class="block text-xs text-muted"><T value={content.contact.linkedinLabel} /></span>
+          <span class="mt-1 block break-all text-sm font-medium text-ink">{contact.linkedin}</span>
+        </a>
+      </div>
+
+      <div class="relative mt-8">
+        <a class="btn-primary" href={contact.emailHref}>
+          <T value={content.contact.cta} />
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

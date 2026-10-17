@@ -1,0 +1,23 @@
+{
+  "name": "levichiavelli-dev-br",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfólio pessoal de Levi Chiavelli — levichiavelli.dev.br",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^6.4.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

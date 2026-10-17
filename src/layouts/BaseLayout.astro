@@ -1,0 +1,151 @@
+---
+import '../styles/global.css';
+import { site, type Localized } from '../data/site';
+import T from '../components/T.astro';
+
+interface Props {
+  title: Localized;
+  description?: Localized;
+  noindex?: boolean;
+}
+
+const { title, description, noindex = false } = Astro.props;
+const canonical = site.url + '/';
+const ogImage = site.url + '/og-image.png';
+---
+
+<!doctype html>
+<html
+  lang="pt"
+  data-lang="pt"
+  data-title-pt={title.pt}
+  data-title-en={title.en}
+  data-description-pt={description?.pt}
+  data-description-en={description?.en}
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title.pt}</title>
+    <meta name="description" content={description?.pt} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <meta name="theme-color" content="#09090b" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow'} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Levi Chiavelli" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title.pt} />
+    <meta property="og:description" content={description?.pt} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title.pt} />
+    <meta name="twitter:description" content={description?.pt} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Define o idioma antes da primeira pintura para evitar flash de conteúdo. -->
+    <script is:inline>
+      (function () {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var query = params.get('lang');
+          var stored = localStorage.getItem('lang');
+          var lang =
+            query === 'en' ? 'en' : query === 'pt' ? 'pt' : stored === 'en' ? 'en' : 'pt';
+          var html = document.documentElement;
+          html.lang = lang;
+          html.dataset.lang = lang;
+          if (lang === 'en' && html.dataset.titleEn) {
+            document.title = html.dataset.titleEn;
+          }
+          var meta = document.querySelector('meta[name="description"]');
+          if (meta && lang === 'en' && html.dataset.descriptionEn) {
+            meta.setAttribute('content', html.dataset.descriptionEn);
+          }
+        } catch (error) {
+          /* mantém o padrão em PT */
+        }
+      })();
+    </script>
+  </head>
+
+  <body class="min-h-dvh bg-bg text-ink">
+    <a
+      href="#conteudo"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#052e1a]"
+    >
+      <T value={{ pt: 'Pular para o conteúdo', en: 'Skip to content' }} />
+    </a>
+
+    <slot />
+
+    <script is:inline>
+      (function () {
+        function apply(lang) {
+          var html = document.documentElement;
+          var target = lang === 'en' ? 'en' : 'pt';
+          html.lang = target;
+          html.dataset.lang = target;
+
+          if (target === 'en' && html.dataset.titleEn) {
+            document.title = html.dataset.titleEn;
+          } else if (html.dataset.titlePt) {
+            document.title = html.dataset.titlePt;
+          }
+
+          var meta = document.querySelector('meta[name="description"]');
+          if (meta) {
+            if (target === 'en' && html.dataset.descriptionEn) {
+              meta.setAttribute('content', html.dataset.descriptionEn);
+            } else if (html.dataset.descriptionPt) {
+              meta.setAttribute('content', html.dataset.descriptionPt);
+            }
+          }
+
+          var buttons = document.querySelectorAll('[data-lang-btn]');
+          for (var i = 0; i < buttons.length; i++) {
+            var active = buttons[i].getAttribute('data-lang-btn') === target;
+            buttons[i].setAttribute('aria-pressed', active ? 'true' : 'false');
+          }
+        }
+
+        var params = new URLSearchParams(window.location.search);
+        var query = params.get('lang');
+        var stored = 'pt';
+        try {
+          stored = localStorage.getItem('lang') === 'en' ? 'en' : 'pt';
+        } catch (error) {
+          /* localStorage indisponível */
+        }
+        var initial = query === 'en' ? 'en' : query === 'pt' ? 'pt' : stored;
+        apply(initial);
+
+        var buttons = document.querySelectorAll('[data-lang-btn]');
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].addEventListener('click', function () {
+            var lang = this.getAttribute('data-lang-btn') === 'en' ? 'en' : 'pt';
+            apply(lang);
+            try {
+              localStorage.setItem('lang', lang);
+            } catch (error) {
+              /* localStorage indisponível */
+            }
+            var url = new URL(window.location.href);
+            url.searchParams.set('lang', lang);
+            window.history.replaceState(null, '', url);
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+---
+import type { Localized } from '../data/site';
+
+interface Props {
+  value: Localized;
+  as?: any;
+  class?: string;
+}
+
+// Renderiza as duas versões (PT e EN) no HTML e o CSS mostra apenas a ativa.
+const { value, as: Tag = 'span', class: className } = Astro.props;
+---
+
+<Tag class={className}><span data-i18n-lang="pt">{value.pt}</span><span data-i18n-lang="en">{value.en}</span></Tag>

@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import T from '../components/T.astro';
+
+const title = { pt: '404 — Página não encontrada', en: '404 — Page not found' };
+const description = {
+  pt: 'A página que você procura não existe ou foi movida.',
+  en: 'The page you are looking for does not exist or has been moved.',
+};
+---
+
+<BaseLayout title={title} description={description} noindex>
+  <main
+    id="conteudo"
+    class="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center px-5 text-center"
+  >
+    <p class="font-mono text-sm text-accent">404</p>
+    <h1 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+      <T value={{ pt: 'Página não encontrada', en: 'Page not found' }} />
+    </h1>
+    <p class="mt-4 text-base leading-relaxed text-muted">
+      <T
+        value={{
+          pt: 'O endereço que você acessou não existe ou foi movido.',
+          en: 'The address you visited does not exist or has been moved.',
+        }}
+      />
+    </p>
+    <a href="/" class="btn-primary mt-8">
+      <T value={{ pt: 'Voltar ao início', en: 'Back home' }} />
+    </a>
+  </main>
+</BaseLayout>

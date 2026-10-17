@@ -1,0 +1,52 @@
+---
+import { content } from '../data/site';
+import T from './T.astro';
+---
+
+<section id="projetos" class="border-b border-line/60 py-20 sm:py-24">
+  <div class="mx-auto max-w-6xl px-5 sm:px-8">
+    <div class="max-w-2xl">
+      <p class="kicker"><T value={content.projects.kicker} /></p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+        <T value={content.projects.heading} />
+      </h2>
+      <p class="mt-4 text-base leading-relaxed text-muted">
+        <T value={content.projects.intro} />
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-5 md:grid-cols-2">
+      {content.projects.items.map((project, index) => (
+        <article class="card flex flex-col gap-4 transition-colors hover:border-accent/50">
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-mono text-xs text-muted">0{index + 1}</span>
+            <span class="chip">{project.stack}</span>
+          </div>
+
+          <h3 class="text-lg font-semibold leading-snug">
+            <T value={project.title} />
+          </h3>
+
+          <p class="text-sm leading-relaxed text-muted">
+            <T value={project.description} />
+          </p>
+
+          {(project.repo || project.demo) && (
+            <div class="mt-auto flex flex-wrap gap-4 pt-2 text-sm font-medium">
+              {project.repo && (
+                <a class="text-accent-strong transition-opacity hover:opacity-80" href={project.repo}>
+                  <T value={content.projects.repoLabel} />
+                </a>
+              )}
+              {project.demo && (
+                <a class="text-accent-strong transition-opacity hover:opacity-80" href={project.demo}>
+                  <T value={content.projects.demoLabel} />
+                </a>
+              )}
+            </div>
+          )}
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
