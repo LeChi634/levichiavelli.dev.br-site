@@ -373,6 +373,24 @@
     will-change: auto;
   }
 
+  /* Conteúdo acima da dobra (header e herói): entra só com deslocamento, sem
+     opacidade. O texto já nasce visível no primeiro quadro — se ele começasse
+     com opacity 0, o Chrome não registraria First Contentful Paint e o
+     Lighthouse abortaria a auditoria com o erro NO_FCP. */
+  .hero-rise {
+    animation: hero-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes hero-rise {
+    from {
+      transform: translateY(14px);
+    }
+
+    to {
+      transform: none;
+    }
+  }
+
   /* Elevação e brilho no hover dos cards de projeto. */
   .card-lift {
     transition:
