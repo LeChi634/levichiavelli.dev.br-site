@@ -1,5 +1,8 @@
 /**
  * Conteúdo central do site (PT/EN) e dados de contato.
+ *
+ * Regra de tom: cargo e prova primeiro, credencial depois. "Estudante/Etec"
+ * aparece uma única vez (na seção Sobre), sem repetir o que o cargo já diz.
  */
 
 export type Lang = 'pt' | 'en';
@@ -36,12 +39,12 @@ export const contact = {
 export const content = {
   meta: {
     title: {
-      pt: 'Levi Chiavelli — Portfólio',
-      en: 'Levi Chiavelli — Portfolio',
+      pt: 'Levi Chiavelli — Desenvolvedor Web',
+      en: 'Levi Chiavelli — Web Developer',
     },
     description: {
-      pt: 'Portfólio de Levi Chiavelli: projetos, habilidades e contato de um estudante de Desenvolvimento de Sistemas.',
-      en: 'Portfolio of Levi Chiavelli: projects, skills and contact details of a Systems Development student.',
+      pt: 'Portfólio de Levi Chiavelli, desenvolvedor web: projetos publicados, habilidades técnicas e contato.',
+      en: 'Portfolio of Levi Chiavelli, web developer: published projects, technical skills and contact.',
     },
   },
 
@@ -55,12 +58,12 @@ export const content = {
   hero: {
     eyebrow: { pt: 'Portfólio', en: 'Portfolio' },
     role: {
-      pt: 'Desenvolvedor de Sistemas em formação',
-      en: 'Systems Developer in training',
+      pt: 'Desenvolvedor Web em formação',
+      en: 'Web Developer in training',
     },
     tagline: {
-      pt: 'Estudante de Desenvolvimento de Sistemas na Etec. Construo sites e sistemas web, aprendendo na prática a cada projeto.',
-      en: 'Systems Development student at Etec. I build websites and web systems, learning hands-on with every project.',
+      pt: 'Projeto e publico sites e sistemas web para pequenos negócios, do layout à entrega. Dois projetos já no ar, desenvolvidos com HTML, CSS, JavaScript e Python.',
+      en: 'I design and ship websites and web systems for small businesses, from layout to delivery. Two projects already live, built with HTML, CSS, JavaScript and Python.',
     },
     ctaProjects: { pt: 'Ver projetos', en: 'View projects' },
     ctaContact: { pt: 'Falar comigo', en: 'Get in touch' },
@@ -72,22 +75,22 @@ export const content = {
     heading: { pt: 'Sobre mim', en: 'About me' },
     paragraphs: [
       {
-        pt: 'Sou Levi Chiavelli, estudante do curso técnico de Desenvolvimento de Sistemas na Etec. Estou construindo minha base em programação, banco de dados e desenvolvimento web — e este site é onde reúno o que venho aprendendo.',
-        en: "I'm Levi Chiavelli, a Systems Development student at Etec. I'm building my foundation in programming, databases and web development — and this site is where I gather what I've been learning.",
+        pt: 'Sou Levi Chiavelli, desenvolvedor web em formação. Curso o técnico em Desenvolvimento de Sistemas na Etec e uso cada projeto do portfólio para levar a teoria à prática — os dois trabalhos abaixo estão publicados e acessíveis em seus endereços definitivos.',
+        en: "I'm Levi Chiavelli, a web developer in training. I'm taking the Systems Development technical course at Etec, and every portfolio project is where theory meets practice — both projects below are published and running at their final addresses.",
       },
       {
-        pt: 'Gosto de transformar ideias em interfaces simples e funcionais, com código organizado e atenção aos detalhes. Meu foco atual é evoluir em front-end e back-end, criando projetos que resolvam problemas reais.',
-        en: 'I like turning ideas into simple, functional interfaces, with organized code and attention to detail. My current focus is growing in front-end and back-end, building projects that solve real problems.',
+        pt: 'Trabalho com HTML, CSS, JavaScript e Python no front-end e com Java e SQL no back-end. Meu foco é entregar interfaces simples, rápidas e responsivas, com código organizado e atenção aos detalhes, do layout à publicação.',
+        en: 'I work with HTML, CSS, JavaScript and Python on the front-end, and with Java and SQL on the back-end. My focus is delivering simple, fast, responsive interfaces, with organized code and attention to detail, from layout to deployment.',
       },
     ],
   },
 
   skills: {
     kicker: { pt: '02 — Habilidades', en: '02 — Skills' },
-    heading: { pt: 'O que eu estudo', en: 'What I study' },
+    heading: { pt: 'Habilidades técnicas', en: 'Technical skills' },
     intro: {
-      pt: 'Tecnologias e ferramentas que estudo e uso nos meus projetos.',
-      en: 'Technologies and tools I study and use in my projects.',
+      pt: 'Tecnologias e ferramentas que aplico nos meus projetos.',
+      en: 'Technologies and tools I apply in my projects.',
     },
     groups: [
       {
@@ -113,8 +116,8 @@ export const content = {
     kicker: { pt: '03 — Projetos', en: '03 — Projects' },
     heading: { pt: 'Projetos', en: 'Projects' },
     intro: {
-      pt: 'Projetos reais que venho desenvolvendo, do design à implementação.',
-      en: 'Real projects I have been building, from design to implementation.',
+      pt: 'Projetos reais, publicados em domínio próprio — do design à implantação.',
+      en: 'Real projects, published on custom domains — from design to deployment.',
     },
     repoLabel: { pt: 'Repositório', en: 'Repository' },
     demoLabel: { pt: 'Demo', en: 'Live demo' },
@@ -135,6 +138,7 @@ export const content = {
           en: "Landing page for Martha Office Hotel, in downtown Bauru, Brazil, rebuilt from the hotel's public information. It brings together rooms, breakfast and location, and turns a booking request into a ready-to-send WhatsApp message.",
         },
         stack: 'HTML, CSS, JavaScript, Python',
+        demo: 'https://marthahotel.levichiavelli.dev.br',
       },
     ] as ProjectItem[],
   },
@@ -143,8 +147,8 @@ export const content = {
     kicker: { pt: '04 — Contato', en: '04 — Contact' },
     heading: { pt: 'Vamos conversar', en: "Let's talk" },
     intro: {
-      pt: 'Quer trocar ideia sobre um projeto, tecnologia ou uma oportunidade? Me chama por um destes canais.',
-      en: 'Want to talk about a project, technology or an opportunity? Reach me through one of these channels.',
+      pt: 'Estou aberto a oportunidades de estágio, projetos freelance e conversas sobre desenvolvimento. Escolha o canal de sua preferência.',
+      en: 'I am open to internships, freelance projects and conversations about development. Pick the channel you prefer.',
     },
     emailLabel: { pt: 'E-mail', en: 'Email' },
     githubLabel: { pt: 'GitHub', en: 'GitHub' },

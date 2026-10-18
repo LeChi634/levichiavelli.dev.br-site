@@ -5,7 +5,7 @@ import T from './T.astro';
 
 <section id="contato" class="py-20 sm:py-24">
   <div class="mx-auto max-w-6xl px-5 sm:px-8">
-    <div class="card relative overflow-hidden p-8 sm:p-12">
+    <div class="card reveal relative overflow-hidden p-8 sm:p-12" data-reveal>
       <div
         class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl"
         aria-hidden="true">
@@ -22,36 +22,46 @@ import T from './T.astro';
       </div>
 
       <div class="relative mt-10 grid gap-3 sm:grid-cols-3">
-        <a
-          class="rounded-lg border border-line bg-bg p-4 transition-colors hover:border-accent/60"
-          href={contact.emailHref}>
-          <span class="block text-xs text-muted"><T value={content.contact.emailLabel} /></span>
-          <span class="mt-1 block break-all text-sm font-medium text-ink">{contact.email}</span>
+        <a class="contact-card" href={contact.emailHref}>
+          <span class="contact-card-label block text-xs"
+            ><T value={content.contact.emailLabel} /></span
+          >
+          <span class="contact-card-value mt-1 block break-all text-sm font-medium text-ink"
+            >{contact.email}</span
+          >
         </a>
 
         <a
-          class="rounded-lg border border-line bg-bg p-4 transition-colors hover:border-accent/60"
+          class="contact-card"
           href={site.github}
           target="_blank"
           rel="noopener noreferrer">
-          <span class="block text-xs text-muted"><T value={content.contact.githubLabel} /></span>
-          <span class="mt-1 block text-sm font-medium text-ink">github.com/LeChi634</span>
+          <span class="contact-card-label block text-xs"
+            ><T value={content.contact.githubLabel} /></span
+          >
+          <span class="contact-card-value mt-1 block text-sm font-medium text-ink"
+            >github.com/LeChi634</span
+          >
         </a>
 
         <a
-          class="rounded-lg border border-line bg-bg p-4 transition-colors hover:border-accent/60"
+          class="contact-card"
           href={contact.linkedinHref}
           target="_blank"
           rel="noopener noreferrer">
-          <span class="block text-xs text-muted"><T value={content.contact.linkedinLabel} /></span>
-          <span class="mt-1 block break-all text-sm font-medium text-ink">{contact.linkedin}</span>
+          <span class="contact-card-label block text-xs"
+            ><T value={content.contact.linkedinLabel} /></span
+          >
+          <span class="contact-card-value mt-1 block break-all text-sm font-medium text-ink"
+            >{contact.linkedin}</span
+          >
         </a>
       </div>
 
       <div class="relative mt-8">
-        <a class="btn-primary" href={contact.emailHref}>
+        <a class="btn btn-primary" href={contact.emailHref}>
           <T value={content.contact.cta} />
-          <span aria-hidden="true">↗</span>
+          <span class="btn-arrow btn-arrow--diag" aria-hidden="true">↗</span>
         </a>
       </div>
     </div>

@@ -5,14 +5,14 @@ import T from './T.astro';
 
 <section id="sobre" class="border-b border-line/60 py-20 sm:py-24">
   <div class="mx-auto grid max-w-6xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.8fr_1.2fr]">
-    <div>
+    <div class="reveal" data-reveal>
       <p class="kicker"><T value={content.about.kicker} /></p>
       <h2 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
         <T value={content.about.heading} />
       </h2>
     </div>
 
-    <div class="space-y-5 text-base leading-relaxed text-muted">
+    <div class="reveal space-y-5 text-base leading-relaxed text-muted" data-reveal style="--reveal-delay: 140ms">
       {content.about.paragraphs.map((paragraph) => (
         <p><T value={paragraph} /></p>
       ))}

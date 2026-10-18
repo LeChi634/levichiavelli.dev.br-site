@@ -4,20 +4,17 @@ import T from './T.astro';
 ---
 
 <header class="sticky top-0 z-50 border-b border-line/70 bg-bg/80 backdrop-blur-md">
-  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
-    <a href="#top" class="flex items-center gap-3 text-sm font-semibold tracking-tight">
-      <span
-        class="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-base font-bold text-accent"
-        aria-hidden="true">L</span
-      >
+  <div class="reveal mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-8" data-reveal>
+    <a href="#top" class="brand-link">
+      <span class="brand-badge" aria-hidden="true">L</span>
       <span>Levi Chiavelli</span>
     </a>
 
-    <nav class="hidden items-center gap-6 text-sm text-muted md:flex" aria-label="Navegação principal / Main navigation">
-      <a class="transition-colors hover:text-ink" href="#sobre"><T value={content.nav.about} /></a>
-      <a class="transition-colors hover:text-ink" href="#habilidades"><T value={content.nav.skills} /></a>
-      <a class="transition-colors hover:text-ink" href="#projetos"><T value={content.nav.projects} /></a>
-      <a class="transition-colors hover:text-ink" href="#contato"><T value={content.nav.contact} /></a>
+    <nav class="hidden items-center gap-6 text-sm md:flex" aria-label="Navegação principal / Main navigation">
+      <a class="nav-link" href="#sobre"><T value={content.nav.about} /></a>
+      <a class="nav-link" href="#habilidades"><T value={content.nav.skills} /></a>
+      <a class="nav-link" href="#projetos"><T value={content.nav.projects} /></a>
+      <a class="nav-link" href="#contato"><T value={content.nav.contact} /></a>
     </nav>
 
     <div

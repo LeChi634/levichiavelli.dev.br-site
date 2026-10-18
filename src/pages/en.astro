@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Skills from '../components/Skills.astro';
+import Projects from '../components/Projects.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import { content } from '../data/site';
+---
+
+<BaseLayout lang="en" path="/en" title={content.meta.title} description={content.meta.description}>
+  <Header />
+  <main id="conteudo">
+    <Hero />
+    <About />
+    <Skills />
+    <Projects />
+    <Contact />
+  </main>
+  <Footer />
+</BaseLayout>

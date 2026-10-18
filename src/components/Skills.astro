@@ -5,7 +5,7 @@ import T from './T.astro';
 
 <section id="habilidades" class="border-b border-line/60 py-20 sm:py-24">
   <div class="mx-auto max-w-6xl px-5 sm:px-8">
-    <div class="max-w-2xl">
+    <div class="reveal max-w-2xl" data-reveal>
       <p class="kicker"><T value={content.skills.kicker} /></p>
       <h2 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
         <T value={content.skills.heading} />
@@ -16,8 +16,12 @@ import T from './T.astro';
     </div>
 
     <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {content.skills.groups.map((group) => (
-        <div class="card">
+      {content.skills.groups.map((group, index) => (
+        <div
+          class="card card-lift reveal"
+          data-reveal
+          style={`--reveal-delay: ${index * 70}ms`}
+        >
           <h3 class="text-sm font-semibold text-ink">
             <T value={group.title} />
           </h3>

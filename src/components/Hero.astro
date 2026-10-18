@@ -4,7 +4,7 @@ import T from './T.astro';
 
 const snippet = `const dev = {
   name: "Levi Chiavelli",
-  studying: "Systems Development",
+  role: "Web Developer",
   stack: ["HTML", "CSS", "JS"],
   focus: "front-end & back-end",
 };`;
@@ -18,7 +18,7 @@ const snippet = `const dev = {
 
   <div
     class="relative mx-auto grid max-w-6xl gap-14 px-5 pb-20 pt-20 sm:px-8 sm:pt-28 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:pb-28">
-    <div>
+    <div class="reveal" data-reveal>
       <p class="flex items-center gap-2 kicker">
         <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
         <T value={content.hero.eyebrow} />
@@ -37,17 +37,17 @@ const snippet = `const dev = {
       </p>
 
       <div class="mt-10 flex flex-wrap items-center gap-3">
-        <a href="#projetos" class="btn-primary">
+        <a href="#projetos" class="btn btn-primary">
           <T value={content.hero.ctaProjects} />
-          <span aria-hidden="true">↓</span>
+          <span class="btn-arrow btn-arrow--down" aria-hidden="true">↓</span>
         </a>
-        <a href="#contato" class="btn-ghost">
+        <a href="#contato" class="btn btn-ghost">
           <T value={content.hero.ctaContact} />
         </a>
       </div>
     </div>
 
-    <div class="hidden lg:block" aria-hidden="true">
+    <div class="reveal hidden lg:block" data-reveal aria-hidden="true">
       <div class="card font-mono text-xs leading-6 text-muted shadow-2xl shadow-black/40">
         <div class="mb-4 flex gap-1.5">
           <span class="h-2.5 w-2.5 rounded-full bg-line"></span>

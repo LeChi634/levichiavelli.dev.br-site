@@ -7,17 +7,31 @@ interface Props {
   title: Localized;
   description?: Localized;
   noindex?: boolean;
+  /** Idioma renderizado no HTML (crawlers não executam JS, então isso importa). */
+  lang?: 'pt' | 'en';
+  /** Caminho canônico desta página; '/' para PT e '/en' para inglês. */
+  path?: string;
 }
 
-const { title, description, noindex = false } = Astro.props;
-const canonical = site.url + '/';
-const ogImage = site.url + '/og-image.png';
+const { title, description, noindex = false, lang = 'pt', path = '/' } = Astro.props;
+const isEn = lang === 'en';
+const canonical = site.url + path;
+const pageTitle = isEn ? title.en : title.pt;
+const pageDescription = isEn ? description?.en : description?.pt;
+// Versão do card OG: sobe o número ao trocar a imagem para furar o cache de
+// preview do WhatsApp/LinkedIn (eles guardam a imagem pela URL).
+const ogImageVersion = '3';
+const ogImage = `${site.url}/og-image${isEn ? '-en' : ''}.png?v=${ogImageVersion}`;
+const ogImageAlt = isEn
+  ? 'Levi Chiavelli — Web Developer in training. levichiavelli.dev.br'
+  : 'Levi Chiavelli — Desenvolvedor Web em formação. levichiavelli.dev.br';
 ---
 
 <!doctype html>
 <html
-  lang="pt"
-  data-lang="pt"
+  lang={lang}
+  data-lang={lang}
+  data-page-lang={lang}
   data-title-pt={title.pt}
   data-title-en={title.en}
   data-description-pt={description?.pt}
@@ -28,9 +42,12 @@ const ogImage = site.url + '/og-image.png';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
 
-    <title>{title.pt}</title>
-    <meta name="description" content={description?.pt} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
     <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="pt-BR" href={site.url + '/'} />
+    <link rel="alternate" hreflang="en" href={site.url + '/en'} />
+    <link rel="alternate" hreflang="x-default" href={site.url + '/'} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <meta name="theme-color" content="#09090b" />
@@ -40,33 +57,50 @@ const ogImage = site.url + '/og-image.png';
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Levi Chiavelli" />
     <meta property="og:url" content={canonical} />
-    <meta property="og:title" content={title.pt} />
-    <meta property="og:description" content={description?.pt} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:locale" content="pt_BR" />
-    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:locale" content={isEn ? 'en_US' : 'pt_BR'} />
+    <meta property="og:locale:alternate" content={isEn ? 'pt_BR' : 'en_US'} />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title.pt} />
-    <meta name="twitter:description" content={description?.pt} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <!-- Define o idioma antes da primeira pintura para evitar flash de conteúdo. -->
     <script is:inline>
+      document.documentElement.classList.add('js-reveal');
       (function () {
         try {
           var params = new URLSearchParams(window.location.search);
           var query = params.get('lang');
           var stored = localStorage.getItem('lang');
-          var lang =
-            query === 'en' ? 'en' : query === 'pt' ? 'pt' : stored === 'en' ? 'en' : 'pt';
           var html = document.documentElement;
+          // Página /en abre em inglês; em / a preferência salva decide.
+          var pageLang = html.dataset.pageLang === 'en' ? 'en' : 'pt';
+          var lang =
+            query === 'en'
+              ? 'en'
+              : query === 'pt'
+                ? 'pt'
+                : pageLang === 'en'
+                  ? 'en'
+                  : stored === 'en'
+                    ? 'en'
+                    : 'pt';
           html.lang = lang;
           html.dataset.lang = lang;
           if (lang === 'en' && html.dataset.titleEn) {
             document.title = html.dataset.titleEn;
+          } else if (lang === 'pt' && html.dataset.titlePt) {
+            document.title = html.dataset.titlePt;
           }
           var meta = document.querySelector('meta[name="description"]');
           if (meta && lang === 'en' && html.dataset.descriptionEn) {
@@ -91,8 +125,57 @@ const ogImage = site.url + '/og-image.png';
 
     <script is:inline>
       (function () {
+        var html = document.documentElement;
+        var EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
+
+        /* Tempos da troca letra por letra: saída + entrada terminam em ~450 ms. */
+        var OUT_MS = 150;
+        var IN_MS = 190;
+        var STAGGER_MS = 18;
+        var MAX_SPREAD_MS = 54;
+        var BLOCK_LIMIT = 80;
+
+        var reduce = false;
+        try {
+          reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        } catch (error) {
+          /* matchMedia indisponível */
+        }
+        var canAnimate = !reduce && typeof Element.prototype.animate === 'function';
+
+        /* Trava o toggle enquanto a troca animada acontece. */
+        var switching = false;
+        var switchingTimer = 0;
+
+        function setBusy(busy) {
+          var btns = document.querySelectorAll('[data-lang-btn]');
+          for (var b = 0; b < btns.length; b++) {
+            if (busy) {
+              btns[b].classList.add('is-busy');
+              btns[b].setAttribute('aria-disabled', 'true');
+            } else {
+              btns[b].classList.remove('is-busy');
+              btns[b].removeAttribute('aria-disabled');
+            }
+          }
+        }
+
+        function startSwitching() {
+          switching = true;
+          setBusy(true);
+          window.clearTimeout(switchingTimer);
+          /* Fallback: nunca deixa o toggle travado para sempre. */
+          switchingTimer = window.setTimeout(stopSwitching, 1000);
+        }
+
+        function stopSwitching() {
+          window.clearTimeout(switchingTimer);
+          switchingTimer = 0;
+          switching = false;
+          setBusy(false);
+        }
+
         function apply(lang) {
-          var html = document.documentElement;
           var target = lang === 'en' ? 'en' : 'pt';
           html.lang = target;
           html.dataset.lang = target;
@@ -119,6 +202,276 @@ const ogImage = site.url + '/og-image.png';
           }
         }
 
+        /* Sincroniza a URL com o idioma: /en em inglês, / em português.
+           Assim o link copiado da barra de endereço sai limpo (sem ?lang=) e
+           abre com o card Open Graph certo. */
+        function syncUrl(lang) {
+          try {
+            var url = new URL(window.location.href);
+            url.pathname = lang === 'en' ? '/en' : '/';
+            url.searchParams.delete('lang');
+            window.history.replaceState(null, '', url.href);
+          } catch (error) {
+            /* histórico indisponível */
+          }
+        }
+
+        /* Aplica o idioma, persiste (URL + localStorage) e pulsa o botão ativo. */
+        function commit(lang) {
+          apply(lang);
+          try {
+            localStorage.setItem('lang', lang);
+          } catch (error) {
+            /* localStorage indisponível */
+          }
+          syncUrl(lang);
+          pulse(lang);
+        }
+
+        function pulse(lang) {
+          var button = document.querySelector('[data-lang-btn="' + lang + '"]');
+          if (!button) return;
+          button.classList.remove('is-pulsing');
+          void button.offsetWidth; /* reinicia a animação CSS */
+          button.classList.add('is-pulsing');
+          window.setTimeout(function () {
+            button.classList.remove('is-pulsing');
+          }, 320);
+        }
+
+        /* ------------------------------------------------------------- *
+         * Microanimação do próprio botão PT/EN: cada letra faz um flip
+         * curto, com ~20 ms de stagger.
+         * ------------------------------------------------------------- */
+        function flipLetters(button) {
+          var letters = button.querySelectorAll('.lang-letter');
+          if (!letters.length) {
+            var text = button.textContent || '';
+            button.textContent = '';
+            for (var i = 0; i < text.length; i++) {
+              var letter = document.createElement('span');
+              letter.className = 'lang-letter';
+              letter.textContent = text.charAt(i);
+              button.appendChild(letter);
+            }
+            letters = button.querySelectorAll('.lang-letter');
+          }
+          for (var j = 0; j < letters.length; j++) {
+            try {
+              letters[j].animate(
+                [
+                  { transform: 'perspective(180px) rotateX(0deg) translateY(0)', opacity: 1 },
+                  {
+                    transform: 'perspective(180px) rotateX(-90deg) translateY(-0.4em)',
+                    opacity: 0.35,
+                    offset: 0.5,
+                  },
+                  { transform: 'perspective(180px) rotateX(0deg) translateY(0)', opacity: 1 },
+                ],
+                { duration: 240, delay: j * 20, easing: EASE, fill: 'none' }
+              );
+            } catch (error) {
+              /* WAAPI indisponível para este elemento */
+            }
+          }
+        }
+
+        /* ------------------------------------------------------------- *
+         * Troca letra por letra dos textos bilíngues.
+         * ------------------------------------------------------------- */
+        var activeAnimations = [];
+        var blockNodes = [];
+        var runToken = 0;
+
+        function toArray(list) {
+          var array = [];
+          for (var i = 0; i < list.length; i++) array.push(list[i]);
+          return array;
+        }
+
+        function register(animation) {
+          activeAnimations.push(animation);
+          return animation;
+        }
+
+        function cancelAnimations() {
+          for (var i = 0; i < activeAnimations.length; i++) {
+            try {
+              activeAnimations[i].cancel();
+            } catch (error) {
+              /* já finalizada */
+            }
+          }
+          activeAnimations = [];
+        }
+
+        /* O texto longo não pode virar inline-block (perde a quebra de linha),
+           então ele anima como bloco: inline-block com a largura do container
+           apenas durante a animação. */
+        function blockOn(el) {
+          if (el.__animBlock) return;
+          el.__animBlock = true;
+          el.__animDisplay = el.style.display;
+          el.__animWidth = el.style.width;
+          el.style.display = 'inline-block';
+          el.style.width = '100%';
+          blockNodes.push(el);
+        }
+
+        function blockOff(el) {
+          if (!el.__animBlock) return;
+          el.__animBlock = false;
+          el.style.display = el.__animDisplay || '';
+          el.style.width = el.__animWidth || '';
+          el.__animDisplay = '';
+          el.__animWidth = '';
+          if (!el.style.cssText) el.removeAttribute('style');
+        }
+
+        function blockOffAll() {
+          for (var i = 0; i < blockNodes.length; i++) blockOff(blockNodes[i]);
+          blockNodes = [];
+        }
+
+        function cleanup() {
+          cancelAnimations();
+          blockOffAll();
+          /* Remove eventuais atributos style vazios deixados pelo modo bloco. */
+          var leftovers = document.querySelectorAll('[data-i18n-lang][style]');
+          for (var i = 0; i < leftovers.length; i++) {
+            if (!leftovers[i].style.cssText) leftovers[i].removeAttribute('style');
+          }
+        }
+
+        /* Quebra o texto em <span> por caractere, agrupado por palavra
+           (cada palavra é inline-block, então a linha só quebra entre palavras). */
+        function splitChars(el) {
+          if (el.dataset.animSplit === '1') {
+            return el.querySelectorAll('.i18n-char');
+          }
+          var parts = (el.textContent || '').split(/(\s+)/);
+          var fragment = document.createDocumentFragment();
+          for (var i = 0; i < parts.length; i++) {
+            var part = parts[i];
+            if (!part) continue;
+            if (/^\s+$/.test(part)) {
+              fragment.appendChild(document.createTextNode(' '));
+              continue;
+            }
+            var word = document.createElement('span');
+            word.className = 'i18n-word';
+            for (var j = 0; j < part.length; j++) {
+              var letter = document.createElement('span');
+              letter.className = 'i18n-char';
+              letter.textContent = part.charAt(j);
+              word.appendChild(letter);
+            }
+            fragment.appendChild(word);
+          }
+          el.textContent = '';
+          el.appendChild(fragment);
+          el.dataset.animSplit = '1';
+          return el.querySelectorAll('.i18n-char');
+        }
+
+        /* Par (PT/EN) de cada texto: o elemento visível atual e o equivalente
+           no idioma de destino. */
+        function collectPairs(from, to) {
+          var nodes = document.querySelectorAll('[data-i18n-lang="' + from + '"]');
+          var pairs = [];
+          for (var i = 0; i < nodes.length; i++) {
+            var out = nodes[i];
+            if (out.closest && out.closest('[aria-hidden="true"]')) continue;
+            if (!out.getClientRects().length) continue;
+            var parent = out.parentElement;
+            var inc = parent ? parent.querySelector('[data-i18n-lang="' + to + '"]') : null;
+            if (!inc) continue;
+            var block =
+              (out.textContent || '').length > BLOCK_LIMIT ||
+              (inc.textContent || '').length > BLOCK_LIMIT;
+            pairs.push({ out: out, inc: inc, block: block, outChars: null, inChars: null, step: 0 });
+          }
+          return pairs;
+        }
+
+        function prepare(pair) {
+          if (pair.block) {
+            blockOn(pair.out);
+            pair.step = 0;
+            return;
+          }
+          pair.outChars = toArray(splitChars(pair.out));
+          pair.inChars = toArray(splitChars(pair.inc));
+          var count = pair.outChars.length;
+          pair.step =
+            count > 1 ? Math.min(STAGGER_MS, MAX_SPREAD_MS / (count - 1)) : 0;
+        }
+
+        function playOut(pair) {
+          var targets = pair.block ? [pair.out] : pair.outChars;
+          for (var i = 0; i < targets.length; i++) {
+            register(
+              targets[i].animate(
+                [
+                  { opacity: 1, transform: 'translateY(0)' },
+                  { opacity: 0, transform: 'translateY(-0.4em)' },
+                ],
+                { duration: OUT_MS, delay: i * pair.step, easing: EASE, fill: 'forwards' }
+              )
+            );
+          }
+        }
+
+        function playIn(pair) {
+          var targets = pair.block ? [pair.inc] : pair.inChars;
+          for (var i = 0; i < targets.length; i++) {
+            register(
+              targets[i].animate(
+                [
+                  { opacity: 0, transform: 'translateY(0.4em)' },
+                  { opacity: 1, transform: 'translateY(0)' },
+                ],
+                { duration: IN_MS, delay: i * pair.step, easing: EASE, fill: 'backwards' }
+              )
+            );
+          }
+        }
+
+        function swapLanguage(target) {
+          var from = html.dataset.lang === 'en' ? 'en' : 'pt';
+          var pairs = collectPairs(from, target);
+          if (!pairs.length) {
+            commit(target);
+            stopSwitching();
+            return;
+          }
+          var token = ++runToken;
+          for (var i = 0; i < pairs.length; i++) {
+            prepare(pairs[i]);
+            playOut(pairs[i]);
+          }
+
+          /* Troca o data-lang no meio do processo e anima a entrada. */
+          window.setTimeout(function () {
+            if (token !== runToken) return;
+            /* Devolve o texto antigo ao display original antes da troca:
+               sem isso o inline-block do bloco venceria o display:none do
+               idioma inativo e os dois textos ficariam visíveis juntos. */
+            blockOffAll();
+            commit(target);
+            for (var j = 0; j < pairs.length; j++) {
+              if (pairs[j].block) blockOn(pairs[j].inc);
+              playIn(pairs[j]);
+            }
+            window.setTimeout(function () {
+              if (token !== runToken) return;
+              cleanup();
+              stopSwitching();
+            }, IN_MS + MAX_SPREAD_MS + 40);
+          }, OUT_MS + MAX_SPREAD_MS);
+        }
+
+        /* ------------------------------------------------------------- */
         var params = new URLSearchParams(window.location.search);
         var query = params.get('lang');
         var stored = 'pt';
@@ -128,23 +481,169 @@ const ogImage = site.url + '/og-image.png';
           /* localStorage indisponível */
         }
         var initial = query === 'en' ? 'en' : query === 'pt' ? 'pt' : stored;
+        /* Em /en a página é em inglês, não importa a preferência salva. */
+        if (html.dataset.pageLang === 'en' && !query) initial = 'en';
         apply(initial);
+        /* Link antigo com ?lang= vira a rota limpa (/en ou /). */
+        syncUrl(initial);
 
         var buttons = document.querySelectorAll('[data-lang-btn]');
         for (var i = 0; i < buttons.length; i++) {
           buttons[i].addEventListener('click', function () {
-            var lang = this.getAttribute('data-lang-btn') === 'en' ? 'en' : 'pt';
-            apply(lang);
-            try {
-              localStorage.setItem('lang', lang);
-            } catch (error) {
-              /* localStorage indisponível */
+            /* Ignora cliques enquanto a troca animada está em andamento. */
+            if (switching) return;
+
+            var target = this.getAttribute('data-lang-btn') === 'en' ? 'en' : 'pt';
+            var current = html.dataset.lang === 'en' ? 'en' : 'pt';
+
+            if (canAnimate) flipLetters(this);
+
+            /* Cancela uma troca em andamento antes de começar outra. */
+            runToken++;
+            cleanup();
+
+            if (!canAnimate || target === current) {
+              commit(target);
+              return;
             }
-            var url = new URL(window.location.href);
-            url.searchParams.set('lang', lang);
-            window.history.replaceState(null, '', url);
+            startSwitching();
+            swapLanguage(target);
           });
         }
+      })();
+    </script>
+
+    <!-- Revela os cards conforme entram na viewport; sem JS, o conteúdo já aparece visível. -->
+    <script is:inline>
+      (function () {
+        var items = document.querySelectorAll('[data-reveal]');
+        if (!items.length) return;
+
+        function showAll() {
+          for (var i = 0; i < items.length; i++) {
+            items[i].classList.add('is-revealed');
+          }
+        }
+
+        var reduce = false;
+        try {
+          reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        } catch (error) {
+          /* matchMedia indisponível */
+        }
+
+        if (reduce || !('IntersectionObserver' in window)) {
+          showAll();
+          return;
+        }
+
+        function start() {
+          var observer = new IntersectionObserver(
+            function (entries) {
+              for (var i = 0; i < entries.length; i++) {
+                if (!entries[i].isIntersecting) continue;
+                entries[i].target.classList.add('is-revealed');
+                observer.unobserve(entries[i].target);
+              }
+            },
+            /* Dispara quando o conteúdo cruza 70% da altura da viewport. */
+            { rootMargin: '0px 0px -30% 0px', threshold: 0 }
+          );
+
+          for (var j = 0; j < items.length; j++) {
+            observer.observe(items[j]);
+          }
+
+          /* O rodapé e blocos no fim da página nunca cruzam a linha de 70%:
+             ao chegar no fim do scroll, revela o que faltou. */
+          var atBottom = false;
+          function revealRemaining() {
+            if (atBottom) return;
+            var doc = document.documentElement;
+            if (window.innerHeight + window.scrollY < doc.scrollHeight - 160) return;
+            atBottom = true;
+            showAll();
+            for (var k = 0; k < items.length; k++) observer.unobserve(items[k]);
+            window.removeEventListener('scroll', revealRemaining);
+            window.removeEventListener('resize', revealRemaining);
+          }
+          window.addEventListener('scroll', revealRemaining, { passive: true });
+          window.addEventListener('resize', revealRemaining);
+          revealRemaining();
+        }
+
+        /* Só observa depois que o quadro com tudo invisível foi pintado,
+           para o fade começar mesmo a partir de opacity 0 na abertura. */
+        function scheduleStart() {
+          requestAnimationFrame(function () {
+            setTimeout(start, 80);
+          });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', scheduleStart);
+        } else {
+          scheduleStart();
+        }
+      })();
+    </script>
+
+    <!-- Luz que segue o cursor: só em ponteiro fino, sem reduced-motion. -->
+    <script is:inline>
+      (function () {
+        var fine = false;
+        try {
+          fine =
+            window.matchMedia('(pointer: fine)').matches &&
+            window.matchMedia('(hover: hover)').matches &&
+            !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        } catch (error) {
+          return;
+        }
+        if (!fine) return;
+
+        var glow = document.createElement('div');
+        glow.id = 'cursor-glow';
+        glow.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(glow);
+
+        var targetX = 0;
+        var targetY = 0;
+        var x = 0;
+        var y = 0;
+        var raf = 0;
+        var LERP = 0.12;
+
+        function render() {
+          x += (targetX - x) * LERP;
+          y += (targetY - y) * LERP;
+          glow.style.transform =
+            'translate3d(' + x + 'px, ' + y + 'px, 0) translate(-50%, -50%)';
+          raf = window.requestAnimationFrame(render);
+        }
+
+        document.addEventListener(
+          'mousemove',
+          function (event) {
+            targetX = event.clientX;
+            targetY = event.clientY;
+            if (!glow.classList.contains('is-visible')) glow.classList.add('is-visible');
+            if (!raf) {
+              x = targetX;
+              y = targetY;
+              raf = window.requestAnimationFrame(render);
+            }
+          },
+          { passive: true }
+        );
+
+        document.addEventListener('mouseleave', function () {
+          glow.classList.remove('is-visible');
+        });
+
+        window.addEventListener('blur', function () {
+          glow.classList.remove('is-visible');
+        });
       })();
     </script>
   </body>

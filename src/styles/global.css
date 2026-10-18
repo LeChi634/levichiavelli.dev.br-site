@@ -16,6 +16,11 @@
 }
 
 @layer base {
+  :root {
+    /* Easing único da interação (mesma curva usada nas animações via WAAPI). */
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   html {
     scroll-behavior: smooth;
   }
@@ -55,40 +60,482 @@
   }
 }
 
-@layer components {
-  .lang-btn {
-    @apply rounded-md px-2.5 py-1 text-xs font-semibold text-muted transition-colors;
+/* Pulso curto ao ativar um idioma no toggle PT/EN. */
+@keyframes lang-pulse {
+  0% {
+    transform: scale(1);
   }
+  45% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 
-  .lang-btn:hover {
-    @apply text-ink;
+@layer components {
+  /* ---------------------------------------------------------------- *
+   * Toggle PT / EN
+   * ---------------------------------------------------------------- */
+  .lang-btn {
+    @apply rounded-md px-2.5 py-1 text-xs font-semibold text-muted;
+    position: relative;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.2s var(--ease-smooth);
   }
 
   .lang-btn[aria-pressed="true"] {
     @apply bg-accent text-[#052e1a];
   }
 
+  /* As letras são separadas pelo JS só no clique (flip/pop com stagger). */
+  .lang-btn .lang-letter {
+    display: inline-block;
+  }
+
+  .lang-btn.is-pulsing {
+    animation: lang-pulse 0.25s var(--ease-smooth);
+  }
+
+  /* Trava visual durante a troca de idioma animada. */
+  .lang-btn.is-busy,
+  .lang-btn[aria-disabled="true"] {
+    pointer-events: none;
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  @media (hover: hover) {
+    .lang-btn[aria-pressed="false"]:hover {
+      color: var(--color-ink);
+      background-color: color-mix(in srgb, var(--color-line) 60%, transparent);
+      transform: scale(1.06);
+    }
+
+    .lang-btn[aria-pressed="false"]:active,
+    .lang-btn[aria-pressed="true"]:active {
+      transform: scale(0.97);
+    }
+  }
+
+  /* ---------------------------------------------------------------- *
+   * Navegação principal: sublinhado que cresce da esquerda
+   * ---------------------------------------------------------------- */
+  .nav-link {
+    position: relative;
+    display: inline-block;
+    color: var(--color-muted);
+    transition:
+      color 0.25s ease,
+      transform 0.3s var(--ease-smooth);
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -3px;
+    height: 1.5px;
+    border-radius: 2px;
+    background-color: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s var(--ease-smooth);
+    pointer-events: none;
+  }
+
+  @media (hover: hover) {
+    .nav-link:hover {
+      color: var(--color-ink);
+      transform: translateY(-1px);
+    }
+
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  .nav-link:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Logo / marca no topo */
+  .brand-link {
+    @apply flex items-center gap-3 text-sm font-semibold tracking-tight;
+    transition:
+      color 0.25s ease,
+      transform 0.3s var(--ease-smooth);
+  }
+
+  .brand-badge {
+    @apply flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-base font-bold text-accent;
+    transition:
+      transform 0.3s var(--ease-smooth),
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  @media (hover: hover) {
+    .brand-link:hover {
+      transform: translateY(-1px);
+    }
+
+    .brand-link:hover .brand-badge {
+      transform: scale(1.05) rotate(-3deg);
+      border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+      box-shadow:
+        0 10px 24px -14px color-mix(in srgb, var(--color-accent) 70%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 25%, transparent);
+    }
+  }
+
+  .brand-link:active {
+    transform: translateY(0) scale(0.99);
+  }
+
+  /* ---------------------------------------------------------------- *
+   * Botões (CTAs)
+   * ---------------------------------------------------------------- */
   .btn {
-    @apply inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-colors;
+    @apply inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold;
+    position: relative;
+    isolation: isolate;
+    transition:
+      transform 0.3s var(--ease-smooth),
+      box-shadow 0.3s ease,
+      border-color 0.3s ease,
+      background-color 0.25s ease,
+      color 0.25s ease;
   }
 
   .btn-primary {
-    @apply inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-[#052e1a] transition-colors hover:bg-accent-strong;
+    @apply bg-accent text-[#052e1a];
+    overflow: hidden;
+  }
+
+  /* Brilho diagonal que atravessa o botão no hover. */
+  .btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      105deg,
+      transparent 25%,
+      rgb(255 255 255 / 0.5) 50%,
+      transparent 75%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-2 rounded-lg border border-line px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-accent/60 hover:text-accent-strong;
+    @apply border border-line text-ink;
   }
 
+  /* Seta (↓ / ↗) desliza na direção dela no hover do botão. */
+  .btn-arrow {
+    display: inline-block;
+    transition: transform 0.25s var(--ease-smooth);
+  }
+
+  @media (hover: hover) {
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      background-color: var(--color-accent-strong);
+      box-shadow:
+        0 16px 34px -14px color-mix(in srgb, var(--color-accent) 55%, transparent),
+        0 0 26px -10px color-mix(in srgb, var(--color-accent) 45%, transparent);
+    }
+
+    .btn-primary:hover::before {
+      transform: translateX(120%);
+      transition: transform 0.6s var(--ease-smooth);
+    }
+
+    .btn-ghost:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--color-accent) 70%, transparent);
+      background-color: color-mix(in srgb, var(--color-accent) 8%, transparent);
+      color: var(--color-accent-strong);
+      box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
+        0 14px 30px -22px color-mix(in srgb, var(--color-accent) 55%, transparent);
+    }
+
+    .btn:hover .btn-arrow--down {
+      transform: translateY(4px);
+    }
+
+    .btn:hover .btn-arrow--diag {
+      transform: translate(3px, -3px);
+    }
+  }
+
+  .btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Botão só de ícone (ex.: ações compactas). */
+  .btn-icon {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-muted;
+    transition:
+      transform 0.25s var(--ease-smooth),
+      color 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  @media (hover: hover) {
+    .btn-icon:hover {
+      color: var(--color-ink);
+      border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+      background-color: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+      transform: translateY(-1px);
+    }
+  }
+
+  .btn-icon:active {
+    transform: scale(0.96);
+  }
+
+  /* ---------------------------------------------------------------- *
+   * Links de texto: sublinhado que cresce da esquerda
+   * ---------------------------------------------------------------- */
+  .link-underline {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-accent-strong);
+    transition:
+      color 0.25s ease,
+      transform 0.3s var(--ease-smooth);
+  }
+
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -3px;
+    height: 1px;
+    background-color: currentColor;
+    opacity: 0.7;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.28s var(--ease-smooth);
+    pointer-events: none;
+  }
+
+  @media (hover: hover) {
+    .link-underline:hover {
+      color: var(--color-accent);
+      transform: translateY(-1px);
+    }
+
+    .link-underline:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  .link-underline:active {
+    transform: translateY(0) scale(0.99);
+  }
+
+  /* ---------------------------------------------------------------- *
+   * Cards
+   * ---------------------------------------------------------------- */
   .card {
     @apply rounded-xl border border-line bg-surface p-6;
   }
 
+  /* Revelação no scroll (a classe .js-reveal é adicionada no <html> antes da pintura). */
+  .reveal {
+    position: relative;
+  }
+
+  .js-reveal .reveal {
+    opacity: 0;
+    translate: 0 16px;
+    transition:
+      /* Curva de entrada suave: começa devagar (invisível) e só depois acelera. */
+      opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1) var(--reveal-delay, 0ms),
+      translate 0.8s cubic-bezier(0.4, 0, 0.2, 1) var(--reveal-delay, 0ms),
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.3s ease,
+      box-shadow 0.35s ease;
+    will-change: opacity, translate;
+  }
+
+  .js-reveal .reveal.is-revealed {
+    opacity: 1;
+    translate: 0 0;
+    will-change: auto;
+  }
+
+  /* Elevação e brilho no hover dos cards de projeto. */
+  .card-lift {
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.3s ease,
+      box-shadow 0.35s ease;
+  }
+
+  .card-lift::after {
+    content: "";
+    position: absolute;
+    inset: 0 1rem auto;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-accent-strong),
+      transparent
+    );
+    opacity: 0.85;
+    transform: scaleX(0);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  @media (hover: hover) {
+    .card-lift:hover {
+      transform: translateY(-6px);
+      border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+      box-shadow:
+        0 24px 48px -24px rgb(0 0 0 / 0.85),
+        0 0 0 1px color-mix(in srgb, var(--color-accent) 22%, transparent),
+        0 18px 40px -28px color-mix(in srgb, var(--color-accent) 45%, transparent);
+    }
+
+    .card-lift:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Cards de contato (e-mail, GitHub, LinkedIn). */
+  .contact-card {
+    @apply rounded-lg border border-line bg-bg p-4;
+    position: relative;
+    isolation: isolate;
+    transition:
+      transform 0.3s var(--ease-smooth),
+      border-color 0.3s ease,
+      box-shadow 0.3s ease,
+      background-color 0.3s ease;
+  }
+
+  .contact-card::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-accent-strong),
+      transparent
+    );
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.45s var(--ease-smooth);
+    pointer-events: none;
+  }
+
+  .contact-card-label {
+    color: var(--color-muted);
+    transition: color 0.25s ease;
+  }
+
+  .contact-card-value {
+    transition:
+      transform 0.3s var(--ease-smooth),
+      color 0.25s ease;
+  }
+
+  @media (hover: hover) {
+    .contact-card:hover {
+      transform: translateY(-4px);
+      border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+      background-color: color-mix(in srgb, var(--color-accent) 5%, var(--color-bg));
+      box-shadow:
+        0 18px 38px -24px rgb(0 0 0 / 0.9),
+        0 0 0 1px color-mix(in srgb, var(--color-accent) 20%, transparent),
+        0 16px 36px -28px color-mix(in srgb, var(--color-accent) 50%, transparent);
+    }
+
+    .contact-card:hover::after {
+      transform: scaleX(1);
+    }
+
+    .contact-card:hover .contact-card-label {
+      color: var(--color-accent-strong);
+    }
+
+    .contact-card:hover .contact-card-value {
+      transform: translateX(2px);
+    }
+  }
+
+  .contact-card:active {
+    transform: translateY(-1px) scale(0.99);
+  }
+
+  /* ---------------------------------------------------------------- *
+   * Troca de idioma letra por letra (spans criados pelo JS no clique)
+   * ---------------------------------------------------------------- */
+  .i18n-word {
+    display: inline-block;
+    white-space: pre;
+  }
+
+  .i18n-char {
+    display: inline-block;
+  }
+
+  /* ---------------------------------------------------------------- */
   .kicker {
     @apply text-xs font-semibold uppercase tracking-[0.28em] text-accent;
   }
 
   .chip {
     @apply inline-flex items-center rounded-full border border-line bg-bg px-3 py-1 text-xs text-muted;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Luz que segue o cursor (criada por JS só com ponteiro fino)
+ * ------------------------------------------------------------------ */
+#cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 260px;
+  border-radius: 9999px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 60;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgba(52, 211, 153, 0.18) 0%,
+    rgba(52, 211, 153, 0.07) 38%,
+    rgba(52, 211, 153, 0) 70%
+  );
+  filter: blur(16px);
+  mix-blend-mode: screen;
+  will-change: transform;
+  transform: translate3d(-9999px, -9999px, 0) translate(-50%, -50%);
+  transition: opacity 0.35s ease;
+}
+
+#cursor-glow.is-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse), (hover: none) {
+  #cursor-glow {
+    display: none;
   }
 }
