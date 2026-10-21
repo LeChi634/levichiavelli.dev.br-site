@@ -75,8 +75,8 @@ export const content = {
     heading: { pt: 'Sobre mim', en: 'About me' },
     paragraphs: [
       {
-        pt: 'Sou Levi Chiavelli, desenvolvedor web em formação. Curso o técnico em Desenvolvimento de Sistemas na Etec e uso cada projeto do portfólio para levar a teoria à prática — os dois trabalhos abaixo estão publicados e acessíveis em seus endereços definitivos.',
-        en: "I'm Levi Chiavelli, a web developer in training. I'm taking the Systems Development technical course at Etec, and every portfolio project is where theory meets practice — both projects below are published and running at their final addresses.",
+        pt: 'Sou Levi Chiavelli, desenvolvedor web em formação. Curso o técnico em Desenvolvimento de Sistemas na Etec e uso cada projeto do portfólio para levar a teoria à prática — os dois trabalhos abaixo estão publicados e acessíveis online.',
+        en: "I'm Levi Chiavelli, a web developer in training. I'm taking the Systems Development technical course at Etec, and every portfolio project is where theory meets practice — both projects below are published and accessible online.",
       },
       {
         pt: 'Trabalho com HTML, CSS, JavaScript e Python no front-end e com Java e SQL no back-end. Meu foco é entregar interfaces simples, rápidas e responsivas, com código organizado e atenção aos detalhes, do layout à publicação.',
@@ -95,19 +95,19 @@ export const content = {
     groups: [
       {
         title: { pt: 'Front-end', en: 'Front-end' },
-        items: ['HTML', 'CSS', 'JavaScript'],
+        items: ['HTML', 'CSS', 'JavaScript', 'Astro', 'Tailwind CSS'],
       },
       {
         title: { pt: 'Back-end', en: 'Back-end' },
-        items: ['Java', 'OOP', 'Lógica'],
+        items: ['Python', 'Java', { pt: 'POO', en: 'OOP' }, { pt: 'Lógica', en: 'Logic' }],
       },
       {
         title: { pt: 'Banco de dados', en: 'Databases' },
-        items: ['MySQL', 'SQL', 'Modelagem'],
+        items: ['MySQL', 'SQL', { pt: 'Modelagem', en: 'Data Modeling' }],
       },
       {
         title: { pt: 'Ferramentas', en: 'Tools' },
-        items: ['Git', 'GitHub', 'VS Code'],
+        items: ['Git', 'GitHub', 'VS Code', 'Cloudflare Workers'],
       },
     ],
   },

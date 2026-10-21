@@ -27,7 +27,9 @@ import T from './T.astro';
           </h3>
           <ul class="mt-4 flex flex-wrap gap-2">
             {group.items.map((item) => (
-              <li class="chip">{item}</li>
+              <li class="chip">
+                {typeof item === 'string' ? item : <T value={item} />}
+              </li>
             ))}
           </ul>
         </div>
