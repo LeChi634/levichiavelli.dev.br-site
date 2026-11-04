@@ -138,8 +138,8 @@ export const content = {
           en: 'High-conversion conceptual landing page for artisanal burger joints. The flagship technical differentiator is the cinematic scroll-driven burger assembly (ScrollCraft), coupled with a reactive client-side store panel (/hamburgueria/painel/) allowing visitors to add, reorder, and edit burger items, photos, and prices directly in the browser with local persistence in real time.',
         },
         stack: 'Next.js 15, React 19, TypeScript, Tailwind CSS, ScrollCraft',
-        demo: 'https://levichiavelli.dev.br/hamburgueria/',
-        panel: 'https://levichiavelli.dev.br/hamburgueria/painel/',
+        demo: 'https://brasalenta.levichiavelli.dev.br/hamburgueria/',
+        panel: 'https://brasalenta.levichiavelli.dev.br/hamburgueria/painel/',
         highlights: [
           {
             pt: 'Montagem cinematográfica em camadas orientada a scroll (ScrollCraft)',
