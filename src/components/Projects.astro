@@ -1,6 +1,9 @@
 ---
 import { content } from '../data/site';
 import T from './T.astro';
+
+const featuredProject = content.projects.items.find((p) => p.featured);
+const regularProjects = content.projects.items.filter((p) => !p.featured);
 ---
 
 <section id="projetos" class="border-b border-line/60 py-20 sm:py-24">
@@ -15,15 +18,86 @@ import T from './T.astro';
       </p>
     </div>
 
-    <div class="mt-12 grid gap-5 md:grid-cols-2">
-      {content.projects.items.map((project, index) => (
+    {featuredProject && (
+      <div class="mt-12">
+        <article
+          class="card card-featured card-lift reveal flex flex-col gap-6"
+          data-reveal
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-xs text-muted">01</span>
+              {featuredProject.tag && (
+                <span class="chip-featured">
+                  <span class="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" aria-hidden="true"></span>
+                  <T value={featuredProject.tag} />
+                </span>
+              )}
+            </div>
+            <span class="chip">{featuredProject.stack}</span>
+          </div>
+
+          <div class="space-y-3">
+            <h3 class="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+              <T value={featuredProject.title} />
+            </h3>
+            <p class="max-w-4xl text-base leading-relaxed text-muted">
+              <T value={featuredProject.description} />
+            </p>
+          </div>
+
+          {featuredProject.highlights && (
+            <ul class="grid gap-2.5 sm:grid-cols-3 pt-1" aria-label="Destaques tecnicos do projeto">
+              {featuredProject.highlights.map((item) => (
+                <li class="flex items-start gap-2.5 rounded-lg border border-line/80 bg-bg/60 p-3 text-xs leading-relaxed text-ink/90">
+                  <span class="mt-0.5 text-accent font-mono font-bold" aria-hidden="true">/</span>
+                  <span><T value={item} /></span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div class="mt-auto flex flex-wrap items-center gap-4 pt-2 text-sm font-medium">
+            {featuredProject.demo && (
+              <a class="btn btn-primary" href={featuredProject.demo} target="_blank" rel="noopener noreferrer">
+                <span><T value={content.projects.demoLabel} /></span>
+                <span class="btn-arrow btn-arrow--diag" aria-hidden="true">↗</span>
+              </a>
+            )}
+            {featuredProject.panel && (
+              <a class="btn btn-ghost border-accent/40 text-accent hover:border-accent hover:bg-accent/10" href={featuredProject.panel} target="_blank" rel="noopener noreferrer">
+                <span><T value={content.projects.panelLabel} /></span>
+                <span class="btn-arrow btn-arrow--diag" aria-hidden="true">↗</span>
+              </a>
+            )}
+            {featuredProject.repo && (
+              <a class="link-underline" href={featuredProject.repo} target="_blank" rel="noopener noreferrer">
+                <T value={content.projects.repoLabel} />
+              </a>
+            )}
+          </div>
+        </article>
+      </div>
+    )}
+
+    <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {regularProjects.map((project, index) => (
         <article
           class="card card-lift reveal flex flex-col gap-4"
           data-reveal
-          style={`--reveal-delay: ${index * 90}ms`}
+          style={`--reveal-delay: ${(index + 1) * 90}ms`}
         >
-          <div class="flex items-center justify-between gap-3">
-            <span class="font-mono text-xs text-muted">0{index + 1}</span>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs text-muted shrink-0">
+                {String(index + 2).padStart(2, '0')}
+              </span>
+              {project.tag && (
+                <span class={project.site ? "chip-production" : "chip-subtle"}>
+                  <T value={project.tag} />
+                </span>
+              )}
+            </div>
             <span class="chip">{project.stack}</span>
           </div>
 
@@ -35,20 +109,24 @@ import T from './T.astro';
             <T value={project.description} />
           </p>
 
-          {(project.repo || project.demo) && (
-            <div class="mt-auto flex flex-wrap gap-4 pt-2 text-sm font-medium">
-              {project.repo && (
-                <a class="link-underline" href={project.repo} target="_blank" rel="noopener noreferrer">
-                  <T value={content.projects.repoLabel} />
-                </a>
-              )}
-              {project.demo && (
-                <a class="link-underline" href={project.demo} target="_blank" rel="noopener noreferrer">
-                  <T value={content.projects.demoLabel} />
-                </a>
-              )}
-            </div>
-          )}
+          <div class="mt-auto flex flex-wrap gap-4 pt-2 text-sm font-medium">
+            {project.site && (
+              <a class="link-underline text-accent font-semibold inline-flex items-center gap-1" href={project.site} target="_blank" rel="noopener noreferrer">
+                <span><T value={content.projects.siteLabel} /></span>
+                <span class="text-xs" aria-hidden="true">↗</span>
+              </a>
+            )}
+            {project.demo && (
+              <a class="link-underline" href={project.demo} target="_blank" rel="noopener noreferrer">
+                <T value={content.projects.demoLabel} />
+              </a>
+            )}
+            {project.repo && (
+              <a class="link-underline" href={project.repo} target="_blank" rel="noopener noreferrer">
+                <T value={content.projects.repoLabel} />
+              </a>
+            )}
+          </div>
         </article>
       ))}
     </div>
