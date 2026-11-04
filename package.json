@@ -12,7 +12,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "sync:hamburgueria": "python tools/sincronizar_hamburgueria.py"
+    "sync:hamburgueria": "python tools/sincronizar_hamburgueria.py",
+    "build:cpanel": "python tools/gerar_zip_cpanel.py"
   },
   "dependencies": {
     "astro": "^6.4.8"
