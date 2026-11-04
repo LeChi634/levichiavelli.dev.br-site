@@ -132,7 +132,7 @@ export const content = {
       {
         featured: true,
         tag: { pt: 'Destaque Especial & Maior Diferencial', en: 'Flagship Showcase & Key Differentiator' },
-        title: { pt: 'Chapa Quente Burger', en: 'Chapa Quente Burger' },
+        title: { pt: 'Brasa Lenta Burger', en: 'Brasa Lenta Burger' },
         description: {
           pt: 'Landing page conceitual de alta conversão para hamburguerias artesanais. O principal diferencial técnico do projeto é a experiência visual de montagem do hambúrguer em camadas impulsionada por rolagem (ScrollCraft), somada a um painel administrativo completo e reativo (/hamburgueria/painel/) onde o cliente cadastra, reordena e edita fotos, lanches e preços em tempo real no navegador (localStorage).',
           en: 'High-conversion conceptual landing page for artisanal burger joints. The flagship technical differentiator is the cinematic scroll-driven burger assembly (ScrollCraft), coupled with a reactive client-side store panel (/hamburgueria/painel/) allowing visitors to add, reorder, and edit burger items, photos, and prices directly in the browser with local persistence in real time.',
